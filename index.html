@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar"><head><meta charset="utf-8"><title>Tagesdokumentation Schulbegleitung</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"><meta name="theme-color" content="#7b1f56"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#7b1f56"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat&family=Patrick+Hand&family=Kalam&family=Indie+Flower&family=Handlee&family=Shadows+Into+Light+Two&family=Coming+Soon&family=Schoolbell&display=swap">
 <style>
 :root{--bg:#f2f0f3;--card:#fff;--tx:#222;--mu:#666;--bd:#ccc;--pu:#7b1f56;--fs:15px;--hw:"Patrick Hand",cursive;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -142,12 +142,10 @@ document.addEventListener("input",r);document.addEventListener("change",r);
 async function mkpdf(){$("warn").textContent="…";
 try{const{jsPDF}=window.jspdf,doc=new jsPDF({unit:"mm",format:"a4"});
 cvs.forEach((c,i)=>{if(i)doc.addPage();doc.addImage(c.toDataURL("image/jpeg",.93),"JPEG",0,0,210,297)});
-const d=window.claude?await claude.use("downloads"):null;
-if(!d){$("warn").textContent="التحميل غير متاح هنا — افتح الرابط في المتصفح / Download not available here";return}
-await d.save({filename:("Tagesdokumentation_"+sel("child")+"_"+dt()+".pdf").replace(/[\s\/]+/g,"_"),data:doc.output("blob")});$("warn").textContent=""}
+const filename=("Tagesdokumentation_"+sel("child")+"_"+dt()+".pdf").replace(/[\\s\\/]+/g,"_");
+doc.save(filename);$("warn").textContent=""}
 catch(e){$("warn").textContent=e&&e.code=="declined"?"":"خطأ في إنشاء PDF / PDF error"}}
-async function mkjpg(){const d=window.claude?await claude.use("downloads"):null;if(!d){$("warn").textContent="التحميل غير متاح هنا — افتح الرابط في المتصفح / Download not available here";return}
-try{for(let i=0;i<2;i++){const b=await new Promise(f=>cvs[i].toBlob(f,"image/jpeg",.93));await d.save({filename:("Tagesdokumentation_"+sel("child")+"_"+dt()+"_S"+(i+1)+".jpg").replace(/[\s\/]+/g,"_"),data:b})}$("warn").textContent=""}catch(e){$("warn").textContent=e&&e.code=="declined"?"":"خطأ / Error"}}
+async function mkjpg(){try{for(let i=0;i<2;i++){const blob=await new Promise(f=>cvs[i].toBlob(f,"image/jpeg",.93));const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=("Tagesdokumentation_"+sel("child")+"_"+dt()+"_S"+(i+1)+".jpg").replace(/[\\s\\/]+/g,"_");document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)}$("warn").textContent=""}catch(e){$("warn").textContent="خطأ / Error"}}
 $("td").onclick=()=>{setD(new Date());r()};$("yd").onclick=()=>{const d=new Date();d.setDate(d.getDate()-1);setD(d);r()};
 $("fnt").onchange=e=>document.documentElement.style.setProperty("--hw",'"'+e.target.value+'",cursive');
 $("lgAr").onclick=()=>lang("ar");$("lgDe").onclick=()=>lang("de");
